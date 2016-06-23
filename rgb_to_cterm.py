@@ -39,11 +39,35 @@ class ColorTester(object):
 		self._hex_colors[candidate] = closest # cache for next time
 		return closest
 
+	def update_color_line(self, line):
+		if not line.startswith("hi"):
+			return line
+		if not 'gui' in line:
+			return line
+		settings = dict()
+		parts = line.split(' ')
+		for part in parts[2:]:
+			if '=' not in part:
+				continue
+			key, value = part.split('=')
+			settings[key] = value
+		for key in [key for key in settings.keys() if key.startswith('gui')]:
+			value = settings[key]
+			cterm_key = key.replace('gui', 'cterm')
+			if value.startswith('#'):
+				cterm_value = self.find_nearest(value[1:])
+			else:
+				cterm_value = value
+			settings[cterm_key] = cterm_value
+		new_settings = " ".join(["=".join((k, str(settings[k]))) for k in reversed(sorted(settings.keys()))])
+		new_line = "{} {} {}".format(parts[0], parts[1], new_settings)
+		return new_line
+
 def main():
 	tester = ColorTester('colors.tsv')
-	to_test = ("875f87", "87005f", "0000d7", "d700d7", "00ff00", "ffffff", "00afaf", "afff01", "afd600", "afff01")
-	for candidate in to_test:
-		print(tester.find_nearest(candidate))
+	with open("/home/sweetpea/.vim/colors/mine.vim", "r") as mine:
+		for line in mine:
+			print(tester.update_color_line(line.rstrip()))
 
 if __name__ == '__main__':
 	main()
