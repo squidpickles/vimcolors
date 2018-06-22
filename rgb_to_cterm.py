@@ -65,7 +65,7 @@ class ColorTester(object):
 
 def main():
 	tester = ColorTester('colors.tsv')
-	with open("mine.vim", "r") as mine:
+	with open("colors.vim", "r") as mine:
 		for line in mine:
 			print(tester.update_color_line(line.rstrip()))
 
